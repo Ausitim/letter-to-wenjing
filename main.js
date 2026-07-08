@@ -2,9 +2,14 @@ const scene = document.querySelector("#letterScene");
 const openButton = document.querySelector("#openLetterButton");
 const musicToggle = document.querySelector("#musicToggle");
 const bgMusic = document.querySelector("#bgMusic");
+const voiceButton = document.querySelector("#voiceNoteButton");
+const voiceStatus = document.querySelector("#voiceNoteStatus");
+const voiceAudio = document.querySelector("#voiceNoteAudio");
+const voiceDuration = document.querySelector(".voice-duration");
 const petalLayer = document.querySelector("#petalLayer");
 
 let hasOpened = false;
+let shouldResumeMusicAfterVoice = false;
 
 function createPetals() {
   const petalCount = 22;
@@ -39,6 +44,16 @@ async function playMusic() {
   }
 }
 
+function formatDuration(seconds) {
+  if (!Number.isFinite(seconds)) {
+    return "00:00";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.round(seconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${remainingSeconds}`;
+}
+
 function openLetter() {
   if (hasOpened) {
     return;
@@ -50,6 +65,12 @@ function openLetter() {
 }
 
 function toggleMusic() {
+  if (!voiceAudio.paused) {
+    voiceAudio.pause();
+    shouldResumeMusicAfterVoice = false;
+    setVoicePlaying(false);
+  }
+
   if (bgMusic.paused) {
     playMusic();
     return;
@@ -60,6 +81,60 @@ function toggleMusic() {
   musicToggle.setAttribute("aria-label", "播放音乐");
 }
 
+function setVoicePlaying(isPlaying) {
+  voiceButton.classList.toggle("is-playing", isPlaying);
+  voiceStatus.textContent = isPlaying ? "正在播放" : "语音留言";
+  voiceButton.setAttribute("aria-label", isPlaying ? "暂停语音留言" : "播放语音留言");
+}
+
+function resumeMusicAfterVoice() {
+  setVoicePlaying(false);
+
+  if (!shouldResumeMusicAfterVoice) {
+    return;
+  }
+
+  shouldResumeMusicAfterVoice = false;
+  playMusic();
+}
+
+async function playVoiceNote() {
+  shouldResumeMusicAfterVoice = !bgMusic.paused;
+
+  if (shouldResumeMusicAfterVoice) {
+    bgMusic.pause();
+  }
+
+  try {
+    await voiceAudio.play();
+    setVoicePlaying(true);
+  } catch {
+    setVoicePlaying(false);
+    resumeMusicAfterVoice();
+  }
+}
+
+function toggleVoiceNote() {
+  if (!voiceAudio.paused) {
+    voiceAudio.pause();
+    resumeMusicAfterVoice();
+    return;
+  }
+
+  if (voiceAudio.ended) {
+    voiceAudio.currentTime = 0;
+  }
+
+  playVoiceNote();
+}
+
+function updateVoiceDuration() {
+  voiceDuration.textContent = formatDuration(voiceAudio.duration);
+}
+
 openButton.addEventListener("click", openLetter);
 musicToggle.addEventListener("click", toggleMusic);
+voiceButton.addEventListener("click", toggleVoiceNote);
+voiceAudio.addEventListener("ended", resumeMusicAfterVoice);
+voiceAudio.addEventListener("loadedmetadata", updateVoiceDuration);
 createPetals();

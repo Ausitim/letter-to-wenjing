@@ -306,6 +306,136 @@ h1 {
   text-align: right;
 }
 
+.voice-note {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 6px;
+}
+
+.voice-bubble {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(76px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 188px;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 10px 14px 10px 12px;
+  color: #183123;
+  cursor: pointer;
+  background: linear-gradient(180deg, #a9f0b7, #82df94);
+  border: 0;
+  border-radius: 8px;
+  box-shadow:
+    0 10px 20px rgba(38, 93, 55, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.voice-bubble::after {
+  position: absolute;
+  right: -7px;
+  bottom: 14px;
+  width: 14px;
+  height: 14px;
+  content: "";
+  background: #82df94;
+  border-radius: 0 3px 0 0;
+  transform: rotate(45deg);
+}
+
+.voice-bubble:focus-visible {
+  outline: 3px solid rgba(183, 79, 117, 0.42);
+  outline-offset: 3px;
+}
+
+.voice-icon {
+  position: relative;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.voice-icon::before {
+  width: 8px;
+  height: 8px;
+  content: "";
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.voice-icon span {
+  position: absolute;
+  left: 5px;
+  border: 2px solid currentColor;
+  border-color: transparent currentColor transparent transparent;
+  border-radius: 50%;
+  opacity: 0.72;
+}
+
+.voice-icon span:nth-child(1) {
+  width: 10px;
+  height: 10px;
+}
+
+.voice-icon span:nth-child(2) {
+  width: 18px;
+  height: 18px;
+}
+
+.voice-icon span:nth-child(3) {
+  width: 26px;
+  height: 26px;
+}
+
+.voice-status {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voice-duration {
+  position: relative;
+  z-index: 1;
+  color: rgba(24, 49, 35, 0.76);
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.voice-bubble.is-playing .voice-icon span {
+  animation: voice-wave 960ms ease-in-out infinite;
+}
+
+.voice-bubble.is-playing .voice-icon span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.voice-bubble.is-playing .voice-icon span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+@keyframes voice-wave {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .music-toggle {
   display: block;
   width: fit-content;
@@ -387,5 +517,10 @@ h1 {
   .intro,
   .letter-body {
     font-size: 16px;
+  }
+
+  .voice-bubble {
+    grid-template-columns: 30px minmax(64px, 1fr) auto;
+    min-width: 168px;
   }
 }
